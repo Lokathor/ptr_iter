@@ -39,6 +39,18 @@ impl<T> Iterator for MutPtrIter<T> {
 impl<T> MutPtrIter<T> {
   /// Iterates all pointers within the slice pointer given.
   ///
+  /// ```rust
+  /// # use ptr_iter::MutPtrIter;
+  /// let mut arr: [u8; 4] = [5, 6, 7, 8];
+  /// let mut iter = unsafe { MutPtrIter::over_slice_ptr(&mut arr).map(|p| *p) };
+  /// assert_eq!(iter.next(), Some(5_u8));
+  /// assert_eq!(iter.next(), Some(6_u8));
+  /// assert_eq!(iter.next(), Some(7_u8));
+  /// assert_eq!(iter.next(), Some(8_u8));
+  /// assert_eq!(iter.next(), None);
+  /// assert_eq!(iter.next(), None);
+  /// ```
+  ///
   /// ## Safety
   /// * The slice pointer must point to a valid allocation.
   /// * You agree ahead of time to not use the iterator after the pointer is
@@ -72,6 +84,18 @@ impl<T> Iterator for ConstPtrIter<T> {
 }
 impl<T> ConstPtrIter<T> {
   /// Iterates all pointers within the slice pointer given.
+  ///
+  /// ```rust
+  /// # use ptr_iter::ConstPtrIter;
+  /// let arr: [u8; 4] = [5, 6, 7, 8];
+  /// let mut iter = unsafe { ConstPtrIter::over_slice_ptr(&arr).map(|p| *p) };
+  /// assert_eq!(iter.next(), Some(5_u8));
+  /// assert_eq!(iter.next(), Some(6_u8));
+  /// assert_eq!(iter.next(), Some(7_u8));
+  /// assert_eq!(iter.next(), Some(8_u8));
+  /// assert_eq!(iter.next(), None);
+  /// assert_eq!(iter.next(), None);
+  /// ```
   ///
   /// ## Safety
   /// * The slice pointer must point to a valid allocation.
