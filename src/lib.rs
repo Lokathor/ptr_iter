@@ -6,6 +6,10 @@
 //! Constructing these iterators is unsafe, but once constructed the iteration
 //! itself is considered a safe operation.
 //!
+//! The two iterators themselves will iterate forever. The constructor functions
+//! apply the correct iterator adapters to limit the iteration to stay within
+//! safe bounds.
+//!
 //! ## Safety
 //! * You must always use the iterator before the pointer it's based upon
 //!   becomes invalidated. This is the same logic as constructing a slice from a
@@ -27,6 +31,10 @@ impl<T> Iterator for MutPtrIter<T> {
     self.0 = unsafe { self.0.add(1) };
     Some(out)
   }
+  #[inline]
+  fn size_hint(&self) -> (usize, Option<usize>) {
+    (usize::MAX, None)
+  }
 }
 impl<T> MutPtrIter<T> {
   /// Iterates all pointers within the slice pointer given.
@@ -35,7 +43,8 @@ impl<T> MutPtrIter<T> {
   /// * The slice pointer must point to a valid allocation.
   /// * You agree ahead of time to not use the iterator after the pointer is
   ///   invalid.
-  pub unsafe fn over_slice_ptr(p: *mut [T]) -> impl Iterator<Item = *mut T> {
+  #[inline]
+  pub unsafe fn over_slice_ptr(p: *mut [T]) -> core::iter::Take<Self> {
     // Safety: the caller has to pass a valid pointer, so we can use
     // new_unchecked because a null pointer is never valid. This appears to be
     // the only stable way to get a slice pointer's length.
@@ -56,6 +65,10 @@ impl<T> Iterator for ConstPtrIter<T> {
     self.0 = unsafe { self.0.add(1) };
     Some(out)
   }
+  #[inline]
+  fn size_hint(&self) -> (usize, Option<usize>) {
+    (usize::MAX, None)
+  }
 }
 impl<T> ConstPtrIter<T> {
   /// Iterates all pointers within the slice pointer given.
@@ -64,9 +77,8 @@ impl<T> ConstPtrIter<T> {
   /// * The slice pointer must point to a valid allocation.
   /// * You agree ahead of time to not use the iterator after the pointer is
   ///   invalid.
-  pub unsafe fn over_slice_ptr(
-    p: *const [T],
-  ) -> impl Iterator<Item = *const T> {
+  #[inline]
+  pub unsafe fn over_slice_ptr(p: *const [T]) -> core::iter::Take<Self> {
     // Safety: the caller has to pass a valid pointer, so we can use
     // new_unchecked because a null pointer is never valid. This appears to be
     // the only stable way to get a slice pointer's length.
