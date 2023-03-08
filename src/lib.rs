@@ -137,7 +137,9 @@ impl<T> ConstPtrIter<T> {
   /// * You agree ahead of time to not use the iterator after the pointer is
   ///   invalid.
   #[inline]
-  pub unsafe fn read_until_default(p: *const T) -> impl Iterator<Item = T>
+  pub unsafe fn read_until_default(
+    p: *const T,
+  ) -> impl Iterator<Item = T> + Clone
   where
     T: Copy + Default + PartialEq,
   {
